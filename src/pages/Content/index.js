@@ -7,26 +7,12 @@ const parseAbi = new Client({
   crypto: new ReactCrypto('flaiksdfhjasoifjlksdfhlsdkfj'),
 }).parseAbi;
 const MAX_PARAM_NAME_LEN = 20;
-const constants = {
-  ETHERSCAN_KEY: 'Z61S2F3JUNFEWDNPS42DWUGQY8YN5GP6CP',
-};
-
-function getContractData(addr, cb) {
-  const BASE = `https://api.etherscan.io`;
-  const url = `${BASE}/api?module=contract&action=getabi&address=${addr}&apikey=${constants.ETHERSCAN_KEY}`;
-  superagent.get(url).end((err, data) => {
-    if (err) return cb(err.toString());
-    const result = JSON.parse(data.text);
-    if (result.message !== 'OK') return cb(result.result);
-    return cb(null, JSON.parse(result.result));
-  });
-}
 
 const main = async () => {
   //setup what we need to modify the dom
   const output = {};
   const settingsQuery = new Promise((resolve) => {
-    chrome.storage.local.get(['relay', 'deviceID'], (result) => {
+    chrome.storage.local.get(['relay', 'deviceID', 'etherscan'], (result) => {
       resolve(result);
     });
   }).then((settings) => {
@@ -40,6 +26,17 @@ const main = async () => {
 
 main()
   .then((settings) => {
+    const getContractData = (addr, cb) => {
+      const BASE = `https://api.etherscan.io`;
+      const url = `${BASE}/api?module=contract&action=getabi&address=${addr}&apikey=${settings['etherscan']}`;
+      superagent.get(url).end((err, data) => {
+        if (err) return cb(err.toString());
+        const result = JSON.parse(data.text);
+        if (result.message !== 'OK') return cb(result.result);
+        return cb(null, JSON.parse(result.result));
+      });
+    };
+
     const writeContractButton = document.getElementById(
       'ContentPlaceHolder1_li_writeContract'
     );
