@@ -12,10 +12,11 @@ interface OptionsProps {
 interface LatticeProps {}
 
 const LatticeSettings: FC<LatticeProps> = ({}: LatticeProps) => {
-  const settingKeys = ['relay', 'deviceID', 'etherscan'];
+  const settingKeys = ['relay', 'deviceID', 'etherscan', 'polygonscan'];
   const [settings, setSettings]: any = useState({
     relay: '',
     etherscan: '',
+    polygonscan: '',
     deviceID: '',
   });
   useEffect(() => {
@@ -105,6 +106,15 @@ const LatticeSettings: FC<LatticeProps> = ({}: LatticeProps) => {
             name={'etherscan'}
             type={'text'}
             value={settings['etherscan']}
+            onChange={handleChangeEvent}
+          />
+        </li>
+        <li>
+          Polygonscan API Key:{' '}
+          <input
+            name={'polygonscan'}
+            type={'text'}
+            value={settings['polygonscan']}
             onChange={handleChangeEvent}
           />
         </li>

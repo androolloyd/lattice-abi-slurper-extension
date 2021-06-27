@@ -12,9 +12,12 @@ const main = async () => {
   //setup what we need to modify the dom
   const output = {};
   const settingsQuery = new Promise((resolve) => {
-    chrome.storage.local.get(['relay', 'deviceID', 'etherscan'], (result) => {
-      resolve(result);
-    });
+    chrome.storage.local.get(
+      ['relay', 'deviceID', 'etherscan', 'polygonscan'],
+      (result) => {
+        resolve(result);
+      }
+    );
   }).then((settings) => {
     output['settings'] = settings;
   });
@@ -26,9 +29,14 @@ const main = async () => {
 
 main()
   .then((settings) => {
-    const getContractData = (addr, cb) => {
-      const BASE = `https://api.etherscan.io`;
-      const url = `${BASE}/api?module=contract&action=getabi&address=${addr}&apikey=${settings['etherscan']}`;
+    const getContractData = (explorer, addr, cb) => {
+      if (explorer == 'etherscan.io') {
+        var BASE = `https://api.etherscan.io`;
+        var url = `${BASE}/api?module=contract&action=getabi&address=${addr}&apikey=${settings['etherscan']}`;
+      } else {
+        var BASE = `https://api.polygonscan.com`;
+        var url = `${BASE}/api?module=contract&action=getabi&address=${addr}&apikey=${settings['polygonscan']}`;
+      }
       superagent.get(url).end((err, data) => {
         if (err) return cb(err.toString());
         const result = JSON.parse(data.text);
@@ -51,8 +59,9 @@ main()
       btn.addEventListener('click', (e) => {
         const paths = window.location.toString().split('/');
         btn.textContent = 'Slurping....';
+        const explorer = paths[2];
         const address = paths[4].split('#')[0];
-        getContractData(address, (err, _defs) => {
+        getContractData(explorer, address, (err, _defs) => {
           if (err) {
             btn.textContent = btnName;
             console.error(`Error for ${address}: ${err}`);
