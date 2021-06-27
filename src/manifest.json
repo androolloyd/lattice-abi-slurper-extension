@@ -2,15 +2,16 @@
   "manifest_version": 3,
   "name": "Lattice1 ABI Slurper",
   "options_page": "options.html",
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["storage"],
   "icons": {
     "128": "icon-128.png"
   },
   "content_scripts": [
     {
-      "matches": ["https://*.etherscan.io/address/*"],
+      "matches": [
+        "https://*.etherscan.io/address/*",
+        "https://*.polygonscan.com/address/*"
+      ],
       "js": ["contentScript.bundle.js"],
       "css": ["content.styles.css"]
     }
